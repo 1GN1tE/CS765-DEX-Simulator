@@ -148,7 +148,7 @@ async function simulateDEX(dis, N) {
                 let _resB = parseFloat(scaleDownBN(resB));
                 reserveRatio[i] = _resA / _resB;
 
-                console.log(`ReserveA: ${_resA} ReserveB: ${_resB} Ratio: ${reserveRatio[i]}`);
+                console.log(`ReserveA: ${_resA.toFixed(18)} ReserveB: ${_resB.toFixed(18)} Ratio: ${reserveRatio[i].toFixed(18)}`);
 
                 if (action === 0) {
                     console.log('Processing deposit...');

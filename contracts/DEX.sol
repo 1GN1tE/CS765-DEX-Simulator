@@ -35,10 +35,8 @@ contract DEX {
         // address of DEX contract
         address dex = address(this);
 
-
         // no amount has been deposited into DEX pool yet
         if (reserveA == 0 && reserveB == 0) {
-            
             // Transfer tokenA and tokenB from user(liquidity provider) to DEX pool
             require(tokenA.transferFrom(user, dex, tokenAAmount), "Failed to add tokenA into DEX pool");
             require(tokenB.transferFrom(user, dex, tokenBAmount), "Failed to add tokenB into DEX pool");
@@ -70,14 +68,12 @@ contract DEX {
         require(tokenA.transferFrom(user, dex, tokenAAmount), "Failed to add tokenA into DEX pool");
         require(tokenB.transferFrom(user, dex, tokenBAmount), "Failed to add tokenB into DEX pool");
 
-        
         uint256 lpTokenAmount = getLpTokenAmountFromTokenA(tokenAAmount);
         lpToken.mint(user, lpTokenAmount);
 
         // update reserve token amount
         reserveA += tokenAAmount;
         reserveB += tokenBAmount;
-
     }
 
     // function to add tokens into DEX pool
@@ -101,11 +97,10 @@ contract DEX {
         // update token reserves
         reserveA -= amountA;
         reserveB -= amountB;
-        returnA=amountA;
-        returnB=amountB;
+        returnA = amountA;
+        returnB = amountB;
         // burn lpToken of user
         lpToken.burn(user, lpTokenAmount);
-
     }
 
     /*
@@ -119,7 +114,6 @@ contract DEX {
         // address of DEX contract
         address dex = address(this);
 
-        
         require(amountA > 0, "Insufficient tokenA provided");
 
         require(tokenA.transferFrom(user, dex, amountA), "TokenA transfer failed");
@@ -134,8 +128,8 @@ contract DEX {
 
         reserveA += amountA;
         reserveB -= amountBToSend;
-        returnB=amountBToSend;
-        
+        returnB = amountBToSend;
+
         distributeSwapFees(swapFees, true, user);
         return amountBToSend;
     }
@@ -151,7 +145,6 @@ contract DEX {
         // address of DEX contract
         address dex = address(this);
 
-        
         require(amountB > 0, "Insufficient tokenB provided");
         require(tokenB.transferFrom(user, dex, amountB), "TokenB transfer failed");
 
@@ -166,25 +159,25 @@ contract DEX {
 
         reserveA -= amountAToSend;
         reserveB += amountB;
-        returnB=amountAToSend;
+        returnA = amountAToSend;
         distributeSwapFees(swapFees, false, user);
         return amountAToSend;
-
     }
 
     // function to distribute swap fees to LPs
     function distributeSwapFees(uint256 fees, bool isTokenA, address receiverAddr) internal {
         uint256 totalLPSupply = lpToken.totalSupply();
-        if(totalLPSupply == 0) {
+        if (totalLPSupply == 0) {
             return;
         }
-        for(uint256 i = 0; i < LPaddress.length; ++i) {
+
+        for (uint256 i = 0; i < LPaddress.length; ++i) {
             uint256 lpTokens = lpToken.balanceOf(LPaddress[i]);
-            if(lpTokens <= 0) {
+            if (lpTokens <= 0) {
                 continue;
             }
             uint256 feeReward = (lpTokens * fees) / totalLPSupply;
-            if(isTokenA) {
+            if (isTokenA) {
                 tokenA.transfer(receiverAddr, feeReward);
             } else {
                 tokenB.transfer(receiverAddr, feeReward);
@@ -194,17 +187,16 @@ contract DEX {
 
     function addToLPaddressList(address addr) internal {
         bool found = false;
-        for(uint256 i = 0; i < LPaddress.length; ++i) {
-            if(LPaddress[i] == addr) {
+        for (uint256 i = 0; i < LPaddress.length; ++i) {
+            if (LPaddress[i] == addr) {
                 found = true;
                 break;
             }
         }
-        if(!found) {
+        if (!found) {
             LPaddress.push(addr);
         }
     }
-
 
     /*
         convert LP tokens in correct proportion and give to user(liquidity provider)
@@ -212,11 +204,11 @@ contract DEX {
         lpTokenMinted = reserveA / (totalLpTokenSupply * tokenAAmount)
     */
     function getLpTokenAmountFromTokenA(uint256 amountA) internal view returns (uint256) {
-
         uint256 totalLPTokenSupply = lpToken.totalSupply();
-        if(totalLPTokenSupply == 0) {
+        if (totalLPTokenSupply == 0) {
             return amountA / 100;
         }
+
         require(reserveA > 0, "reserveB cannot be zero");
         uint256 totalLpMinted = (totalLPTokenSupply * amountA) / reserveA;
         return totalLpMinted;
@@ -227,9 +219,7 @@ contract DEX {
         amountA = (lpAmount * reserveA) / totalLpTokenSupply;
     */
     function getTokenAFromLpToken(uint256 lpAmount) internal view returns (uint256) {
-
         uint256 totalLPTokenSupply = lpToken.totalSupply();
-
         require(totalLPTokenSupply > 0, "No LP tokens exist");
 
         uint256 amountA = (lpAmount * reserveA) / totalLPTokenSupply;
@@ -237,30 +227,30 @@ contract DEX {
     }
 
     // function to calculate reserve ratio of A to B
-    function getSpotPriceForA() public view returns (uint256){
+    function getSpotPriceForA() public view returns (uint256) {
         require(reserveB > 0, "reserveB cannot be zero");
         return (reserveA * 1e18) / reserveB;
     }
 
     // function to calculate reserve ratio of B to A
-    function getSpotPriceForB() public view returns (uint256){
+    function getSpotPriceForB() public view returns (uint256) {
         require(reserveA > 0, "reserveA cannot be zero");
         return (reserveB * 1e18) / reserveA;
     }
 
-    function getLpTokenAmount() external view returns(uint256) {
+    function getLpTokenAmount() external view returns (uint256) {
         return lpToken.totalSupply();
     }
 
-    function getReserves() public view returns(uint256, uint256) {
+    function getReserves() public view returns (uint256, uint256) {
         return (reserveA, reserveB);
     }
 
-    function getReserveA() public view returns(uint256) {
+    function getReserveA() public view returns (uint256) {
         return reserveA;
     }
 
-    function getReserveB() public view returns(uint256) {
+    function getReserveB() public view returns (uint256) {
         return reserveB;
     }
 }
