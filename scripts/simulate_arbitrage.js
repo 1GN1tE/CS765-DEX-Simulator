@@ -37,7 +37,7 @@ function printOutput(amountChosen, actionType, profitAchieved) {
     }    console.log(`Amount chosen for swapping ${amountChosen} and profit acheived ${profitAchieved} `);
 }
 
-async function simulateDEX(dis, N) {
+async function simulateArbitrage(dis, N) {
     try {
         console.log("Starting Simulation for Arbitrage.......");
 
@@ -201,7 +201,7 @@ async function simulateDEX(dis, N) {
 
         // Swapping in one DEX to create arbitrage opportunity
         console.log(`Performing swaping in one dex to create arbitrage oppertunity`);
-        await dex2Instance.methods.swapAToB(web3.utils.toBN("1000000000000000000000")).send({ from: traders[0] });
+        await dex2Instance.methods.swapAToB(web3.utils.toBN("500000000000000000000")).send({ from: traders[0] });
 
         // Case 2: Arbitrage opportunity exists but not profitable enough
         console.log(`----------------- Case 2: -------------------`);
@@ -349,4 +349,4 @@ async function simulateDEX(dis, N) {
     }
 }
 
-simulateDEX(15 * 10 ** 6, 5);
+simulateArbitrage(15 * 10 ** 6, 5);
